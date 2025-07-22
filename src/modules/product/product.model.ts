@@ -6,6 +6,7 @@ import { paginate } from "../paginate";
 
 const productSchema = new mongoose.Schema<IProductDoc,IProductModel>(
   {
+    _id: mongoose.Schema.Types.ObjectId,
     name: {
       type: String,
       required: true,

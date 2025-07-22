@@ -5,6 +5,8 @@ import { UpdateUserBody } from "../user/user.interfaces";
 import { ApiError } from "../errors";
 import httpStatus from "http-status";
 import { IOptions, QueryResult } from "../paginate/paginate";
+import { publishToExchange } from '../rabbit/rabbit.publisher';
+
 
 
 
@@ -15,8 +17,20 @@ import { IOptions, QueryResult } from "../paginate/paginate";
  * @returns {Promise<IProductDoc>}
  */
 export const createProduct = async (productBody: IProduct): Promise<IProductDoc> => {
-    return Product.create(productBody);
+  const id = new mongoose.Types.ObjectId(); 
+
+  const productWithId = {
+    ...productBody,
+    _id: id,
   };
+
+  
+  await publishToExchange('productAndUser.product.created', productWithId);
+
+ 
+  return Product.create(productWithId);
+};
+
 
 /**
  * Get product by id
@@ -53,6 +67,9 @@ export const queryProducts = async (filter: Record<string, any>, options: IOptio
     }
     Object.assign(product, updateBody);
     await product.save();
+
+    await publishToExchange('productAndUser.product.updated', {productId,updateBody});
+
     return product;
   };
 
@@ -67,5 +84,6 @@ export const queryProducts = async (filter: Record<string, any>, options: IOptio
       throw new ApiError(httpStatus.NOT_FOUND, 'Product not found');
     }
     await product.deleteOne();
+    await publishToExchange('productAndUser.product.deleted',productId);
     return product;
   };
