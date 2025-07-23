@@ -4,6 +4,7 @@ import User from './user.model';
 import ApiError from '../errors/ApiError';
 import { IOptions, QueryResult } from '../paginate/paginate';
 import { NewCreatedUser, UpdateUserBody, IUserDoc, NewRegisteredUser } from './user.interfaces';
+import { publishToExchange } from '../rabbit/rabbit.publisher';
 
 /**
  * Create a user
@@ -14,7 +15,17 @@ export const createUser = async (userBody: NewCreatedUser): Promise<IUserDoc> =>
   if (await User.isEmailTaken(userBody.email)) {
     throw new ApiError(httpStatus.BAD_REQUEST, 'Email already taken');
   }
-  return User.create(userBody);
+
+  const id = new mongoose.Types.ObjectId(); 
+  
+    const userWithId = {
+      ...userBody,
+      _id: id,
+    };
+  
+    
+    await publishToExchange('productAndUser.user.created', userWithId);
+  return User.create(userWithId);
 };
 
 /**
@@ -26,7 +37,15 @@ export const registerUser = async (userBody: NewRegisteredUser): Promise<IUserDo
   if (await User.isEmailTaken(userBody.email)) {
     throw new ApiError(httpStatus.BAD_REQUEST, 'Email already taken');
   }
-  return User.create(userBody);
+  const id = new mongoose.Types.ObjectId(); 
+  const userWithId = {
+      ...userBody,
+      _id: id,
+    };
+  
+    
+    await publishToExchange('productAndUser.user.registered', userWithId);
+  return User.create(userWithId);
 };
 
 /**
@@ -73,6 +92,9 @@ export const updateUserById = async (
   }
   Object.assign(user, updateBody);
   await user.save();
+
+  await publishToExchange('productAndUser.user.updated', {userId,updateBody});
+
   return user;
 };
 
@@ -87,5 +109,6 @@ export const deleteUserById = async (userId: mongoose.Types.ObjectId): Promise<I
     throw new ApiError(httpStatus.NOT_FOUND, 'User not found');
   }
   await user.deleteOne();
+  await publishToExchange('productAndUser.user.deleted',userId);
   return user;
 };

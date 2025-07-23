@@ -2,8 +2,8 @@ import mongoose from 'mongoose';
 import app from './app';
 import config from './config/config';
 import logger from './modules/logger/logger';
-//import { startProductCreatedConsumer } from './modules/rabbit/consumers/productCreated.consumer';
 import { getRabbitConnection } from './modules/rabbit/rabbit.connection';
+import { startStockConsumer } from './modules/rabbit/consumers/stock.consumer';
 
 let server: any;
 mongoose.connect(config.mongoose.url).then(() => {
@@ -23,7 +23,7 @@ async function bootstrap() {
     process.exit(1);
   });
 
-  //await startProductCreatedConsumer();
+  await startStockConsumer();
 }
 bootstrap().catch((err) => {
   console.error("Fallo al iniciar app:", err);
