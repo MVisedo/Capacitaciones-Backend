@@ -5,7 +5,6 @@ import { paginate } from "../paginate";
 
 const stockSchema = new mongoose.Schema<IStockDoc,IStockModel>(
   {
-    _id: mongoose.Schema.Types.ObjectId,
     productId: {
       type: mongoose.Schema.Types.ObjectId,
       required: true,

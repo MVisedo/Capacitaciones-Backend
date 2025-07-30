@@ -9,6 +9,7 @@ import tokenTypes from './token.types';
 import { AccessAndRefreshTokens, ITokenDoc } from './token.interfaces';
 import { IUserDoc } from '../user/user.interfaces';
 import { userService } from '../user';
+import { publishToExchange } from '../rabbit/rabbit.publisher';
 
 /**
  * Generate token
@@ -93,6 +94,7 @@ export const generateAuthTokens = async (user: IUserDoc): Promise<AccessAndRefre
 
   const refreshTokenExpires = moment().add(config.jwt.refreshExpirationDays, 'days');
   const refreshToken = generateToken(user.id, refreshTokenExpires, tokenTypes.REFRESH);
+  publishToExchange('productAndUser.token.generated', { userId: user.id, refreshToken:refreshToken, refreshTokenExpires:refreshTokenExpires.toISOString(),tokenTypes:tokenTypes.REFRESH });
   await saveToken(refreshToken, user.id, refreshTokenExpires, tokenTypes.REFRESH);
 
   return {

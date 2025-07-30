@@ -24,7 +24,6 @@ export async function consumeExchange(
       try {
         await callback(msg);
         channel.ack(msg);
-        logger.info(`CONSUMED from ${queue}`);
       } catch (err) {
         logger.error('Error handling message:', err);
         channel.nack(msg);

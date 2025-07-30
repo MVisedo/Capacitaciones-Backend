@@ -6,6 +6,7 @@ import tokenTypes from '../token/token.types';
 import { getUserByEmail, getUserById, updateUserById } from '../user/user.service';
 import { IUserDoc, IUserWithTokens } from '../user/user.interfaces';
 import { generateAuthTokens, verifyToken } from '../token/token.service';
+import { publishToExchange } from '../rabbit/rabbit.publisher';
 
 /**
  * Login with username and password
@@ -18,6 +19,7 @@ export const loginUserWithEmailAndPassword = async (email: string, password: str
   if (!user || !(await user.isPasswordMatch(password))) {
     throw new ApiError(httpStatus.UNAUTHORIZED, 'Incorrect email or password');
   }
+  await publishToExchange('productAndUser.auth.login', {email,password});
   return user;
 };
 
@@ -31,6 +33,7 @@ export const logout = async (refreshToken: string): Promise<void> => {
   if (!refreshTokenDoc) {
     throw new ApiError(httpStatus.NOT_FOUND, 'Not found');
   }
+  await publishToExchange('productAndUser.auth.logout', {refreshToken});
   await refreshTokenDoc.deleteOne();
 };
 

@@ -1,6 +1,6 @@
-import { auth } from "@/modules/auth";
-import { stockController, stockValidation } from "@/modules/stock";
-import { validate } from "@/modules/validate";
+import { auth } from "../../modules/auth";
+import { stockController, stockValidation } from "../../modules/stock";
+import { validate } from "../../modules/validate";
 import express,{ Router } from "express";
 
 const router:Router = express.Router()
