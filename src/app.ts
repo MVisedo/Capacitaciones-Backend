@@ -13,6 +13,7 @@ import { authLimiter } from './modules/utils';
 import { ApiError, errorConverter, errorHandler } from './modules/errors';
 import routes from './routes/v1';
 
+
 const app: Express = express();
 
 if (config.env !== 'test') {
@@ -27,8 +28,7 @@ app.use(helmet());
 app.use(cors());
 app.options('*', cors());
 
-// parse json request body
-app.use(express.json());
+
 
 // parse urlencoded request body
 app.use(express.urlencoded({ extended: true }));
@@ -49,6 +49,8 @@ if (config.env === 'production') {
   app.use('/v1/auth', authLimiter);
 }
 
+app.use('/uploads', express.static('uploads'));
+
 // v1 api routes
 app.use('/v1', routes);
 
@@ -62,5 +64,7 @@ app.use(errorConverter);
 
 // handle error
 app.use(errorHandler);
+
+
 
 export default app;

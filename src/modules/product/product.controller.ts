@@ -9,8 +9,16 @@ import { IOptions } from "../paginate/paginate";
 
 
 export const createProduct = catchAsync(async (req: Request, res: Response) => {
-    const product = await productService.createProduct(req.body);
-    res.status(httpStatus.CREATED).send({product});
+  const data = req.body;
+  console.log('req.body:', req.body);
+  console.log('req.file:', req.file);
+
+  if (req.file) {
+  data.imagen = req.file.path; 
+  }
+
+  const product = await productService.createProduct(data);
+  res.status(httpStatus.CREATED).send({product});
 });
 
 
@@ -34,7 +42,13 @@ export const getProducts = catchAsync(async (req: Request, res: Response) => {
 
 export const updateProduct = catchAsync(async (req: Request, res: Response) => {
   if (typeof req.params['productId'] === 'string') {
-    const product = await productService.updateProductById(new mongoose.Types.ObjectId(req.params['productId']), req.body);
+    const data = req.body;
+
+    if (req.file) {
+    data.imagen = req.file.path;
+    }
+
+    const product = await productService.updateProductById(new mongoose.Types.ObjectId(req.params['productId']), data);
     res.send(product);
   }
 });

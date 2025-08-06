@@ -4,14 +4,14 @@ import { authValidation, authController, auth } from '../../modules/auth';
 
 const router: Router = express.Router();
 
-router.post('/register', validate(authValidation.register), authController.register);
-router.post('/login', validate(authValidation.login), authController.login);
-router.post('/logout', validate(authValidation.logout), authController.logout);
-router.post('/refresh-tokens', validate(authValidation.refreshTokens), authController.refreshTokens);
-router.post('/forgot-password', validate(authValidation.forgotPassword), authController.forgotPassword);
-router.post('/reset-password', validate(authValidation.resetPassword), authController.resetPassword);
-router.post('/send-verification-email', auth(), authController.sendVerificationEmail);
-router.post('/verify-email', validate(authValidation.verifyEmail), authController.verifyEmail);
+router.post('/register',express.json(), validate(authValidation.register), authController.register);
+router.post('/login', express.json(),validate(authValidation.login), authController.login);
+router.post('/logout', express.json(),validate(authValidation.logout), authController.logout);
+router.post('/refresh-tokens', express.json(),validate(authValidation.refreshTokens), authController.refreshTokens);
+router.post('/forgot-password', express.json(),validate(authValidation.forgotPassword), authController.forgotPassword);
+router.post('/reset-password', express.json(),validate(authValidation.resetPassword), authController.resetPassword);
+router.post('/send-verification-email',express.json(), auth(), authController.sendVerificationEmail);
+router.post('/verify-email',express.json(), validate(authValidation.verifyEmail), authController.verifyEmail);
 
 export default router;
 

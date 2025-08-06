@@ -1,14 +1,16 @@
 import Joi from "joi";
-import { IProduct } from "./product.interfaces";
+
 import { objectId } from "../validate";
 
-const createProductBody: Record<keyof IProduct, any> = {
+const createProductBody ={
   name: Joi.string().required(),
   descripcion: Joi.string().required(),
-  imagen: Joi.string().required(),
   user: Joi.string().required().custom(objectId),
-  precio: Joi.number().required(),
+  precio: Joi.alternatives()
+    .try(Joi.number(), Joi.string().regex(/^\d+(\.\d+)?$/))
+    .required(),
 };
+
 
 export const createProduct = {
   body: Joi.object().keys(createProductBody),
