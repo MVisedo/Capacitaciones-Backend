@@ -6,6 +6,8 @@ import { ApiError } from "../errors";
 import httpStatus from "http-status";
 import { IOptions, QueryResult } from "../paginate/paginate";
 import { publishToExchange } from '../rabbit/rabbit.publisher';
+import  fs  from "fs";
+
 
 
 
@@ -65,6 +67,12 @@ export const queryProducts = async (filter: Record<string, any>, options: IOptio
     if (!product) {
       throw new ApiError(httpStatus.NOT_FOUND, 'Product not found');
     }
+    try {
+      fs.unlinkSync(product.imagen);
+    } catch (error) {
+      console.error("No se pudo eliminar la imagen vinculada al producto")
+    }
+    
     Object.assign(product, updateBody);
     await product.save();
 
@@ -82,6 +90,11 @@ export const queryProducts = async (filter: Record<string, any>, options: IOptio
     const product = await getProductById(productId);
     if (!product) {
       throw new ApiError(httpStatus.NOT_FOUND, 'Product not found');
+    }
+    try {
+      fs.unlinkSync(product.imagen);
+    } catch (error) {
+      console.error("No se pudo eliminar la imagen vinculada al producto")
     }
     await product.deleteOne();
     await publishToExchange('productAndUser.product.deleted',productId);

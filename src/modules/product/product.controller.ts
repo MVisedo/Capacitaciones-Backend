@@ -10,8 +10,6 @@ import { IOptions } from "../paginate/paginate";
 
 export const createProduct = catchAsync(async (req: Request, res: Response) => {
   const data = req.body;
-  console.log('req.body:', req.body);
-  console.log('req.file:', req.file);
 
   if (req.file) {
   data.imagen = req.file.path; 
@@ -56,6 +54,7 @@ export const updateProduct = catchAsync(async (req: Request, res: Response) => {
 
 export const deleteProduct = catchAsync(async (req: Request, res: Response) => {
   if (typeof req.params['productId'] === 'string') {
+    
     await productService.deleteProductById(new mongoose.Types.ObjectId(req.params['productId']));
     res.status(httpStatus.NO_CONTENT).send();
   }
